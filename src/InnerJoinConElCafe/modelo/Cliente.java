@@ -1,4 +1,6 @@
-public class Cliente {
+package InnerJoinConElCafe.modelo;
+
+public abstract class Cliente {
 
     protected String nombre;
     protected String domicilio;
@@ -18,12 +20,11 @@ public class Cliente {
     @Override
     public String toString() {
         return "Cliente{" +
-                "Tipo Cliente: " + tipoCliente() +
                 "nombre='" + nombre + '\'' +
                 ", domicilio='" + domicilio + '\'' +
                 ", nif='" + nif + '\'' +
                 ", email='" + email + '\'' +
-                '}';
+                "} ";
     }
   
 
@@ -61,10 +62,4 @@ public class Cliente {
         this.email = email;
     }
 
-
-
-    //Metodo para identificar el tipo de cliente -- usado en el toString -- Si la orden viene de la clase Premium, lo sustituye por "Premium"
-    public String tipoCliente(){
-        return "Estandar";
-    }
 }

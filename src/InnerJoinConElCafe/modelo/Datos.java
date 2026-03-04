@@ -1,7 +1,9 @@
+package InnerJoinConElCafe.modelo;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class Tienda {
+public class Datos {
 
     private List<Cliente> listaClientes;
     private List<Articulo> listaArticulos;
@@ -16,7 +18,7 @@ public class Tienda {
                 '}';
     }
 
-    public Tienda() {
+    public Datos() {
         this.listaClientes = new ArrayList<>();
         this.listaArticulos = new ArrayList<>();
         this.listaPedidos = new ArrayList<>();
