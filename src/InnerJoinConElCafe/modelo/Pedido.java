@@ -31,10 +31,12 @@ public class Pedido {
         this.articulo = articulo;
     }
 
-    public double calcularPrecio(){
+    public double calcularPrecio() {
         double precioBase = articulo.getPrecioVenta() * cantidad;
-        double envio = cliente.calcularGastosEnvio(articulo.getGastosEnvio());
-        return precioBase + envio;
+        double precioFinalProductos = cliente.aplicarDescuento(precioBase);
+        double envio = articulo.getGastosEnvio() * cantidad; 
+    
+        return precioFinalProductos + envio;
     }
 
     public boolean puedeCancelarse(){
@@ -53,8 +55,7 @@ public class Pedido {
 
 
 
-    //getter setters
-
+    //getters y setters
     public int getNumeroPedido() {
         return numeroPedido;
     }

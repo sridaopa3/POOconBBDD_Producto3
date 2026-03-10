@@ -21,8 +21,8 @@ public class Articulo {
         return "Articulo{" +
                 "codigo='" + codigo + '\'' +
                 ", descripcion='" + descripcion + '\'' +
-                ", precioVenta=" + precioVenta +
-                ", gastosEnvio=" + gastosEnvio +
+                ", precioVenta=" + String.format("%.2f", precioVenta) +
+                ", gastosEnvio=" + String.format("%.2f", gastosEnvio) +
                 ", tiempoPreparacion=" + tiempoPreparacion +
                 '}';
     }

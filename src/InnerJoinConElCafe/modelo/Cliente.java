@@ -13,8 +13,9 @@ public abstract class Cliente {
         this.nif = nif;
         this.email = email;
     }
-      public double calcularGastosEnvio(double gastosEnvio){
-            return gastosEnvio;
+
+    public double aplicarDescuento(double precioBase) {
+        return precioBase; // El cliente estándar devuelve el precio tal cual
     }
         
     @Override
@@ -29,7 +30,7 @@ public abstract class Cliente {
   
 
 
-        //getters y setters
+    //getters y setters
     public String getNombre() {
         return nombre;
     }

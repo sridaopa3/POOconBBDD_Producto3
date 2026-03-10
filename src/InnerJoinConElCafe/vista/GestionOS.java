@@ -29,6 +29,7 @@ public class GestionOS {
             System.out.println("6. Mostrar Pedidos");
             System.out.println("7. Cancelar Pedido");
             System.out.println("0. Salir");
+            System.out.print("Selecciona una opción: ");
             opcion = pedirOpcion();
             switch (opcion) {
                 case '1':
@@ -125,15 +126,32 @@ public class GestionOS {
     }
 
     private void mostrarClientes() {
-        System.out.println("--- Lista de Clientes ---");
-        Resultado<Lista<Cliente>> res = controlador.obtenerClientes();
-
-        if (!res.esExitoso()) {
-            System.out.println(res.getMensaje());
-        } else {
-            for (Cliente c : res.getDato().getArrayList()) {
-                System.out.println(c.toString());
+        System.out.println("\n--- FILTRAR CLIENTES ---");
+        System.out.println("1. Mostrar todos");
+        System.out.println("2. Mostrar clientes Estándar");
+        System.out.println("3. Mostrar clientes Premium");
+        System.out.print("Selecciona una opción: ");
+    
+        try {
+            int opcion = Integer.parseInt(teclado.nextLine());
+            if (opcion < 1 || opcion > 3) {
+                System.out.println("Opción no válida.");
+                return;
             }
+
+            Resultado<Lista<Cliente>> res = controlador.obtenerClientes(opcion);
+
+            if (res.esExitoso()) {
+                System.out.println("\n--- LISTA DE CLIENTES ---");
+                for (Cliente c : res.getDato().getArrayList()) {
+                    System.out.println(c.toString());
+                }
+            } else {
+                System.out.println("\nAVISO: " + res.getMensaje());
+            }
+
+        } catch (NumberFormatException e) {
+            System.out.println("Error: Debes introducir un número válido (1, 2 o 3).");
         }
     }
 
@@ -192,7 +210,7 @@ public class GestionOS {
                 System.out.println("------------------------------------------");
                 System.out.println(p.toString());
                 System.out.println("ESTADO: " + (p.puedeCancelarse() ? "EN CURSO" : "PROCESADO"));
-                System.out.println("TOTAL: " + p.calcularPrecio() + "€");
+                System.out.println("TOTAL: " + String.format("%.2f", p.calcularPrecio()) + " euros");
             }
         }
         System.out.println("==========================================\n");

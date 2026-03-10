@@ -94,13 +94,28 @@ public class Controlador {
     }
 
     //Mostrar clientes
-    public Resultado<Lista<Cliente>> obtenerClientes() {
+    public Resultado<Lista<Cliente>> obtenerClientes(int opcion) {
         try {
-            Lista<Cliente> clientes = datos.getListaClientes();
-            if (clientes.getSize() == 0) {
-                throw new ListaVaciaException("No hay clientes registrados en el sistema.");
+            Lista<Cliente> todos = datos.getListaClientes();
+            Lista<Cliente> filtrados = new Lista<>();
+
+            for (Cliente c : todos.getArrayList()) {
+                if (opcion == 1) { // TODOS
+                    filtrados.añadir(c);
+                } else if (opcion == 2 && c instanceof ClienteEstandar) { // SOLO ESTÁNDAR
+                    filtrados.añadir(c);
+                } else if (opcion == 3 && c instanceof ClientePremium) { // SOLO PREMIUM
+                    filtrados.añadir(c);
+                }
             }
-            return new Resultado<>(clientes, "Lista de clientes recuperada.");
+
+            // Reutilizamos nuestra excepción si el filtro no devuelve nada
+            if (filtrados.getSize() == 0) {
+                throw new ListaVaciaException("No hay clientes del tipo seleccionado.");
+            }
+
+            return new Resultado<>(filtrados, "Lista de clientes recuperada.");
+
         } catch (ListaVaciaException e) {
             return new Resultado<>(e.getMessage());
         }
