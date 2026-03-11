@@ -126,7 +126,7 @@ public class Controlador {
     //Pedidos
 
     //Metodos para buscar cliente y articulo
-    private Articulo buscarArticulo(String codigo) throws DatoNoEncontradoException {
+    public Articulo buscarArticulo(String codigo) throws DatoNoEncontradoException {
         for (Articulo a : datos.getListaArticulos().getArrayList()) {
             if (a.getCodigo().equals(codigo)) return a;
         }
@@ -134,7 +134,7 @@ public class Controlador {
         throw new DatoNoEncontradoException("El artículo con código '" + codigo + "' no existe.");
     }
 
-    private Cliente buscarCliente(String nif) throws DatoNoEncontradoException {
+    public Cliente buscarCliente(String nif) throws DatoNoEncontradoException {
         for (Cliente c : datos.getListaClientes().getArrayList()) {
             if (c.getNif().equals(nif)) return c;
         }

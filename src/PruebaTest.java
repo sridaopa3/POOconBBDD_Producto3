@@ -24,12 +24,12 @@ public class PruebaTest {
 
     @Test
     void testCalculoPrecioPremiumConDescuento() {
-        // Lógica: (10.0 * 0.8) + 5.0 = 13.0
+        // Lógica: 10.0 + (5.0 * 0.8) = 14.0
         Pedido pedido = new Pedido(1, 1, LocalDateTime.now(), cafe, clientePremium);
-        double esperado = 13.0;
+        double esperado = 14.0;
         
         assertEquals(esperado, pedido.calcularPrecio(), 0.01, 
-            "El descuento del 20% sobre el precio del artículo no se ha calculado bien.");
+            "El descuento del 20% sobre el precio del envio no se ha calculado bien.");
     }
 
     @Test
@@ -40,7 +40,7 @@ public class PruebaTest {
         
         // Al tener 0 min de preparación, no debería dejar cancelarlo nada más crearse
         assertFalse(pedidoExpira.puedeCancelarse(), 
-            "Un pedido con tiempo de preparación 0 debería considerarse 'ya en proceso' y no cancelable.");
+            "El pedido no deberia poder cancelarse, ya está procesado.");
     }
 
     @Test

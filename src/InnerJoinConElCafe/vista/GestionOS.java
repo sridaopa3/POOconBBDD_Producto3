@@ -2,6 +2,7 @@ package InnerJoinConElCafe.vista;
 
 import java.util.Scanner;
 import InnerJoinConElCafe.controlador.Controlador;
+import InnerJoinConElCafe.excepciones.DatoNoEncontradoException;
 import InnerJoinConElCafe.modelo.Articulo;
 import InnerJoinConElCafe.modelo.Cliente;
 import InnerJoinConElCafe.modelo.Lista;
@@ -116,9 +117,15 @@ public class GestionOS {
         System.out.println("Email:");
         String email = teclado.nextLine();
 
-        System.out.println("Tipo de cliente (1. Estándar / 2. Premium):");
-        int tipo = teclado.nextInt();
-        teclado.nextLine(); //Limpieza de buffer
+        //Hasta que no se selecciona 1 o 2, no sale del bucle
+        int seleccion = 0;
+        int tipo = 0;
+        while (seleccion < 1 || seleccion > 2){
+            System.out.println("Tipo de cliente (1. Estándar / 2. Premium):");
+            tipo = teclado.nextInt();
+            teclado.nextLine(); //Limpieza de buffer
+            seleccion = tipo;
+        }
 
         // Enviamos al controlador el 'tipo' para que él decida qué objeto crear
         Resultado<String> res = controlador.añadirCliente(nombre, domicilio, nif, email, tipo);
@@ -130,25 +137,28 @@ public class GestionOS {
         System.out.println("1. Mostrar todos");
         System.out.println("2. Mostrar clientes Estándar");
         System.out.println("3. Mostrar clientes Premium");
+        System.out.println("0. Salir");
         System.out.print("Selecciona una opción: ");
     
         try {
             int opcion = Integer.parseInt(teclado.nextLine());
-            if (opcion < 1 || opcion > 3) {
+            if (opcion < 0 || opcion > 3) {
                 System.out.println("Opción no válida.");
                 return;
             }
 
-            Resultado<Lista<Cliente>> res = controlador.obtenerClientes(opcion);
+            if (opcion != 0){
+                Resultado<Lista<Cliente>> res = controlador.obtenerClientes(opcion);
 
-            if (res.esExitoso()) {
-                System.out.println("\n--- LISTA DE CLIENTES ---");
-                for (Cliente c : res.getDato().getArrayList()) {
-                    System.out.println(c.toString());
+                if (res.esExitoso()) {
+                    System.out.println("\n--- LISTA DE CLIENTES ---");
+                    for (Cliente c : res.getDato().getArrayList()) {
+                        System.out.println(c.toString());
+                    }
+                } else {
+                    System.out.println("\nAVISO: " + res.getMensaje());
                 }
-            } else {
-                System.out.println("\nAVISO: " + res.getMensaje());
-            }
+            } else { return; }
 
         } catch (NumberFormatException e) {
             System.out.println("Error: Debes introducir un número válido (1, 2 o 3).");
@@ -164,9 +174,22 @@ public class GestionOS {
         int num = teclado.nextInt();
         teclado.nextLine(); //Limpieza de buffer
     
-        System.out.println("NIF del Cliente:");
+        System.out.print("NIF del Cliente: ");
         String nif = teclado.nextLine();
-    
+
+        try {
+            controlador.buscarCliente(nif); 
+        } catch (DatoNoEncontradoException e) {
+            System.out.println("El cliente no existe. ¿Desea registrarlo ahora? (S/N):");
+
+            if (teclado.nextLine().equalsIgnoreCase("s")) {
+                añadirCliente();
+            } else {
+                System.out.println("Pedido cancelado: cliente no encontrado.");
+                return; 
+            }
+        }
+
         System.out.println("Código del Artículo:");
         String codigo = teclado.nextLine();
     
@@ -184,20 +207,34 @@ public class GestionOS {
         System.out.println("1. Mostrar TODOS los pedidos");
         System.out.println("2. Mostrar pedidos EN CURSO (Pendientes de envío)");
         System.out.println("3. Mostrar pedidos PROCESADOS (Ya enviados)");
+        System.out.println("0. Salir");
         System.out.print("Seleccione una opción: ");
-        char opcionEstado = pedirOpcion();
 
-        // Segundo nivel de filtro: ¿Filtrar por cliente?
+        String entrada = teclado.nextLine();
+    
+        if (entrada.equals("0")) {
+            return; 
+        }
+        
+        char opcionEstado = entrada.charAt(0);
+
+        // Validamos rango (si no es 1, 2 o 3)
+        if (opcionEstado < '1' || opcionEstado > '3') {
+            System.out.println("Opción no válida.");
+            return;
+        }
+
+        // --- Segundo nivel de filtro ---
         System.out.println("\n¿Desea filtrar por un cliente específico? (S/N):");
         char filtrarPorCliente = pedirOpcion();
-    
+
         String nif = null;
         if (filtrarPorCliente == 's' || filtrarPorCliente == 'S') {
             System.out.print("Introduce el NIF del cliente: ");
             nif = teclado.nextLine();
         }
 
-        // Llamada única al controlador con ambos criterios
+        // Llamada al controlador
         Resultado<Lista<Pedido>> res = controlador.obtenerPedidosFiltrados(opcionEstado, nif);
 
         // Visualización de resultados
@@ -205,16 +242,18 @@ public class GestionOS {
         if (!res.esExitoso()) {
             System.out.println("MENSAJE: " + res.getMensaje());
         } else {
-            System.out.println("RESULTADO: " + res.getMensaje());
+            System.out.println("RESULTADOS ENCONTRADOS:");
             for (Pedido p : res.getDato().getArrayList()) {
                 System.out.println("------------------------------------------");
                 System.out.println(p.toString());
+                // Mostramos si el pedido ya ha pasado el tiempo de preparación o no
                 System.out.println("ESTADO: " + (p.puedeCancelarse() ? "EN CURSO" : "PROCESADO"));
                 System.out.println("TOTAL: " + String.format("%.2f", p.calcularPrecio()) + " euros");
             }
         }
         System.out.println("==========================================\n");
     }
+
 
     private void eliminarPedido() {
         System.out.println("\n--- CANCELACIÓN DE PEDIDO ---");
