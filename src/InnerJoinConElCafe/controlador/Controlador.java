@@ -142,6 +142,10 @@ public class Controlador {
         throw new DatoNoEncontradoException("El cliente con NIF '" + nif + "' no existe.");
     }
 
+    //Nuevo metodo para generar el numero de pedido automaticamente
+    public int generarNuevoNumeroPedido() {
+        return datos.getListaPedidos().getArrayList().size() + 1;
+    }
 
 
     //Añadir pedido

@@ -77,18 +77,51 @@ public class GestionOS {
     //Articulos
     private void añadirArticulo() {
         System.out.println("--- Nuevo Artículo ---");
-        System.out.println("Código:");
+        System.out.print("Código: ");
         String codigo = teclado.nextLine();
-        System.out.println("Descripción:");
+        System.out.print("Descripción: ");
         String desc = teclado.nextLine();
-        System.out.println("Precio de Venta:");
-        double precioV = teclado.nextDouble();
-        System.out.println("Gastos de envio:");
-        double gastosE = teclado.nextDouble();
-        System.out.println("Tiempo de preparacion (min):");
-        int tiempoPrep = teclado.nextInt();
-        teclado.nextLine(); //Limpieza de buffer
 
+        // --- Validación para Precio de Venta ---
+        double precioV = 0;
+        boolean precioValido = false;
+        while (!precioValido) {
+            try {
+                System.out.print("Precio de Venta: ");
+                precioV = Double.parseDouble(teclado.nextLine());
+                precioValido = true;
+            } catch (NumberFormatException e) {
+                System.out.println("Error: Introduce un número decimal válido (ej: 10,5).");
+            }
+        }
+
+        // --- Validación para Gastos de Envío ---
+        double gastosE = 0;
+        boolean gastosValidos = false;
+        while (!gastosValidos) {
+            try {
+                System.out.print("Gastos de envio: ");
+                gastosE = Double.parseDouble(teclado.nextLine());
+                gastosValidos = true;
+            } catch (NumberFormatException e) {
+                System.out.println("Error: Introduce un número decimal válido (ej: 10,5).");
+            }
+        }
+
+        // --- Validación para Tiempo de Preparación ---
+        int tiempoPrep = 0;
+        boolean tiempoValido = false;
+        while (!tiempoValido) {
+            try {
+                System.out.print("Tiempo de preparacion (min): ");
+                tiempoPrep = Integer.parseInt(teclado.nextLine());
+                tiempoValido = true;
+            } catch (NumberFormatException e) {
+                System.out.println("Error: Introduce un número entero para los minutos.");
+            }
+        }
+
+        // Enviamos los datos ya limpios y validados al controlador
         Resultado<String> res = controlador.añadirArticulo(codigo, desc, precioV, gastosE, tiempoPrep);
         System.out.println(res.getMensaje());
     }
@@ -175,9 +208,9 @@ public class GestionOS {
     //Pedidos
     private void añadirPedido() {
         System.out.println("--- Nuevo Pedido ---");
-        System.out.println("Número de pedido:");
-        int num = teclado.nextInt();
-        teclado.nextLine(); //Limpieza de buffer
+        //Se genera automaticamente el numero de pedido
+        int num = controlador.generarNuevoNumeroPedido(); 
+        System.out.println("Número de pedido asignado: " + num);
     
         System.out.print("NIF del Cliente: ");
         String nif = teclado.nextLine();
