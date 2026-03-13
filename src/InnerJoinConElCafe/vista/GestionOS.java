@@ -212,6 +212,7 @@ public class GestionOS {
         int num = controlador.generarNuevoNumeroPedido(); 
         System.out.println("Número de pedido asignado: " + num);
     
+        //2. VERIFICACION DE CLIENTE
         System.out.print("NIF del Cliente: ");
         String nif = teclado.nextLine();
 
@@ -228,12 +229,36 @@ public class GestionOS {
             }
         }
 
-        System.out.println("Código del Artículo:");
-        String codigo = teclado.nextLine();
+       // 3. VERIFICACION DE ARTICULO (existe)
+        String codigo = "";
+        boolean articuloValido = false;
     
-        System.out.println("Cantidad:");
-        int cant = teclado.nextInt();
-        teclado.nextLine(); //Limpieza de buffer
+        while (!articuloValido) {
+            System.out.print("Código del Artículo: ");
+            codigo = teclado.nextLine();
+        
+            try {
+                controlador.buscarArticulo(codigo);
+                articuloValido = true; // Si lo encuentra, salimos del bucle
+            } catch (DatoNoEncontradoException e) {
+                System.out.println("Error: " + e.getMessage());
+                System.out.println("Por favor, introduce un código de artículo que exista.");
+            }
+        }
+
+        // 4. VERIFICACION DE CANTIDAD
+        int cant = 0;
+        boolean cantValida = false;
+        while (!cantValida) {
+            try {
+                System.out.print("Cantidad: ");
+                cant = Integer.parseInt(teclado.nextLine());
+                if (cant > 0) cantValida = true;
+                else System.out.println("La cantidad debe ser mayor que 0.");
+            } catch (NumberFormatException e) {
+                System.out.println("Error: Introduce un número entero.");
+            }
+        }
 
         // El controlador hará el trabajo sucio de buscar y unir las piezas
         Resultado<String> res = controlador.añadirPedido(num, nif, codigo, cant);
