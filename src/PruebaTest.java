@@ -60,7 +60,7 @@ public class PruebaTest {
     @Test
     void testControlExpiracionPedido() {
         // Creamos un artículo que se prepara en 0 minutos (expira al instante)
-        Articulo cafeFlash = new Articulo("A2", "Cafe Flash", 10.0, 5.0, 0);
+        Articulo cafeFlash = new Articulo("A2", "Cafe Flash", 10.0, 5.0,0);
         Pedido pedidoExpira = new Pedido(2, 1, LocalDateTime.now(), cafeFlash, clienteNormal);
         
         // Al tener 0 min de preparación, no debería dejar cancelarlo nada más crearse
