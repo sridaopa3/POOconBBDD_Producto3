@@ -1,5 +1,6 @@
 package InnerJoinConElCafe.vista;
 
+import java.util.List;
 import java.util.Scanner;
 import InnerJoinConElCafe.controlador.Controlador;
 import InnerJoinConElCafe.excepciones.DatoNoEncontradoException;
@@ -128,12 +129,12 @@ public class GestionOS {
 
     private void mostrarArticulo() {
         System.out.println("--- Lista de Artículos ---");
-        Resultado<Lista<Articulo>> res = controlador.obtenerArticulos();
+        Resultado<List<Articulo>> res = controlador.obtenerArticulos();
 
         if (!res.esExitoso()) {
             System.out.println(res.getMensaje());
         } else {
-            for (Articulo a : res.getDato().getArrayList()) {
+            for (Articulo a : res.getDato()) {
                 System.out.println(a.toString());
             }
         }
@@ -186,11 +187,11 @@ public class GestionOS {
             }
 
             if (opcion != 0){
-                Resultado<Lista<Cliente>> res = controlador.obtenerClientes(opcion);
+                Resultado<List<Cliente>> res = controlador.obtenerClientes(opcion);
 
                 if (res.esExitoso()) {
                     System.out.println("\n--- LISTA DE CLIENTES ---");
-                    for (Cliente c : res.getDato().getArrayList()) {
+                    for (Cliente c : res.getDato()) {
                         System.out.println(c.toString());
                     }
                 } else {
@@ -298,7 +299,7 @@ public class GestionOS {
         }
 
         // Llamada al controlador
-        Resultado<Lista<Pedido>> res = controlador.obtenerPedidosFiltrados(opcionEstado, nif);
+        Resultado<List<Pedido>> res = controlador.obtenerPedidosFiltrados(opcionEstado, nif);
 
         // Visualización de resultados
         System.out.println("\n==========================================");
@@ -306,7 +307,7 @@ public class GestionOS {
             System.out.println("MENSAJE: " + res.getMensaje());
         } else {
             System.out.println("RESULTADOS ENCONTRADOS:");
-            for (Pedido p : res.getDato().getArrayList()) {
+            for (Pedido p : res.getDato()) {
                 System.out.println("------------------------------------------");
                 System.out.println(p.toString());
                 // Mostramos si el pedido ya ha pasado el tiempo de preparación o no
