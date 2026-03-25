@@ -9,28 +9,39 @@ import java.util.List;
 
 public class MySQLArticuloDAO implements ArticuloDAO {
 
-    private final String INSERT = "INSERT INTO articulos (descripcion, precioVenta, gastosEnvio, tiempoPreparacion) VALUES (?, ?, ?, ?)";
     private final String GET_ALL = "SELECT * FROM articulos";
     private final String DELETE = "DELETE FROM articulos WHERE codigo = ?";
 
     @Override
     public void insertar(Articulo a) throws Exception {
-        try (Connection conn = ConexionBD.conectar();
-            PreparedStatement stat = conn.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS)) {
+        Connection conn = null;
+        try {
+            conn = ConexionBD.conectar();
+            // 1. Desactivamos el autoCommit
+            conn.setAutoCommit(false); 
+
+            // PROCEDIMIENTO ALMACENADO
+            // 2. Llamamos al procedimiento almacenado (CallableStatement)
+            String sql = "{call insertarArticulo(?, ?, ?, ?)}";
+            try (CallableStatement cstmt = conn.prepareCall(sql)) {
+                cstmt.setString(1, a.getDescripcion());
+                cstmt.setDouble(2, a.getPrecioVenta());
+                cstmt.setDouble(3, a.getGastosEnvio());
+                cstmt.setInt(4, a.getTiempoPreparacion());
             
-            stat.setString(1, a.getDescripcion());
-            stat.setDouble(2, a.getPrecioVenta());
-            stat.setDouble(3, a.getGastosEnvio());
-            stat.setInt(4, a.getTiempoPreparacion());
-
-            stat.executeUpdate();
-
-            // Obtenemos el ID generado por el AUTO_INCREMENT de MySQL y lo asignamos al objeto directamente tras crearlo
-            try (ResultSet rs = stat.getGeneratedKeys()) {
-                if (rs.next()) {
-                    a.setCodigo(rs.getInt(1)); 
-                }
+                cstmt.executeUpdate();
             }
+
+            // TRANSACCIONES
+            // 3. Si todo sale correcto, hacemos el commit 
+            conn.commit(); 
+        
+        } catch (Exception e) {
+            // 4. Si ocurre algun tipo de error, hacemos rollback para evitar problemas
+            if (conn != null) conn.rollback();
+            throw e;
+        } finally {
+            if (conn != null) conn.close();
         }
     }
 

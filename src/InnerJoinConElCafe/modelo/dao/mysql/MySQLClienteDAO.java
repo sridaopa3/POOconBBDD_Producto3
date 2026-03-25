@@ -11,32 +11,34 @@ import java.util.List;
 
 public class MySQLClienteDAO implements ClienteDAO {
 
-    private final String INSERT = "INSERT INTO clientes (nif, nombre, domicilio, email, tipo, cuotaAnual, descuentoEnvio) VALUES (?, ?, ?, ?, ?, ?, ?)";
     private final String GET_ALL = "SELECT * FROM clientes";
 
     @Override
     public void insertar(Cliente c) throws Exception {
-        try (Connection conn = ConexionBD.conectar();
-        PreparedStatement stat = conn.prepareStatement(INSERT)) {
-        
-            stat.setString(1, c.getNif());
-            stat.setString(2, c.getNombre());
-            stat.setString(3, c.getDomicilio());
-            stat.setString(4, c.getEmail());
-        
-            // Determinamos el tipo y sacamos los valores específicos
-            if (c instanceof ClientePremium) {
-                stat.setString(5, "Premium");
-                // Usa el getter de la clase Cliente, estos getters se encargan de revisar las subclases para determinar el valor correcto
-                stat.setDouble(6, c.getCuotaAnual()); 
-                stat.setDouble(7, c.getDescuentoEnvio());
-            } else {
-                stat.setString(5, "Estandar");
-                stat.setDouble(6, c.getCuotaAnual());
-                stat.setDouble(7, c.getDescuentoEnvio());
+        Connection conn = null;
+        try {
+            conn = ConexionBD.conectar();
+            conn.setAutoCommit(false); 
+
+            String sql = "{call insertarCliente(?, ?, ?, ?, ?, ?, ?)}";
+            try (CallableStatement cst = conn.prepareCall(sql)) {
+                cst.setString(1, c.getNif());
+                cst.setString(2, c.getNombre());
+                cst.setString(3, c.getDomicilio());
+                cst.setString(4, c.getEmail());
+                cst.setString(5, (c instanceof ClientePremium) ? "Premium" : "Estandar");
+                cst.setDouble(6, c.getCuotaAnual());
+                cst.setDouble(7, c.getDescuentoEnvio());
+            
+                cst.executeUpdate();
             }
-        
-            stat.executeUpdate();
+
+            conn.commit(); 
+        } catch (Exception e) {
+            if (conn != null) conn.rollback(); 
+            throw e;
+        } finally {
+            if (conn != null) conn.close();
         }
     }
 

@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MySQLPedidoDAO implements PedidoDAO {
-
-    private final String INSERT = "INSERT INTO pedidos (numeroPedido, cantidad, fechaHora, nif_cliente, articulo_codigo) VALUES (?, ?, ?, ?, ?)";
     
     // SQL con JOIN para traer los datos del Cliente y del Artículo asociados al pedido
     private final String GET_ALL = "SELECT p.*, a.descripcion, a.precioVenta, a.gastosEnvio, a.tiempoPreparacion, " +
@@ -18,16 +16,29 @@ public class MySQLPedidoDAO implements PedidoDAO {
                                    "INNER JOIN articulos a ON p.articulo_codigo = a.codigo " +
                                    "INNER JOIN clientes c ON p.nif_cliente = c.nif";
 
-    @Override
     public void insertar(Pedido p) throws Exception {
-        try (Connection conn = ConexionBD.conectar();
-             PreparedStatement stat = conn.prepareStatement(INSERT)) {
-            stat.setInt(1, p.getNumeroPedido());
-            stat.setInt(2, p.getCantidad());
-            stat.setTimestamp(3, Timestamp.valueOf(p.getFechaHora()));
-            stat.setString(4, p.getCliente().getNif());
-            stat.setInt(5, p.getArticulo().getCodigo());
-            stat.executeUpdate();
+        Connection conn = null;
+        try {
+            conn = ConexionBD.conectar();
+            conn.setAutoCommit(false);
+
+            String sql = "{call sp_insertar_pedido(?, ?, ?, ?, ?)}";
+            try (CallableStatement cst = conn.prepareCall(sql)) {
+                cst.setInt(1, p.getNumeroPedido());
+                cst.setInt(2, p.getCantidad());
+                cst.setTimestamp(3, Timestamp.valueOf(p.getFechaHora()));
+                cst.setString(4, p.getCliente().getNif());
+                cst.setInt(5, p.getArticulo().getCodigo());
+            
+                cst.executeUpdate();
+            }
+
+            conn.commit(); 
+        } catch (Exception e) {
+            if (conn != null) conn.rollback();
+            throw e;
+        } finally {
+            if (conn != null) conn.close();
         }
     }
 
