@@ -12,4 +12,14 @@ public class ClienteEstandar extends Cliente {
         return super.toString() + 
         "Tipo Cliente: Estandar ";
     }
+
+    @Override
+    public double getCuotaAnual() {
+        return 0.0;
+    }
+
+    @Override
+    public double getDescuentoEnvio() {
+        return 0.0;
+    }
 }

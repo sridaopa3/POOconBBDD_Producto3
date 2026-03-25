@@ -13,7 +13,7 @@ public class PruebaTest {
     @BeforeEach
     void setUp() {
         // Articulo: 10€ venta, 5€ envío, 1 minuto de preparación
-        cafe = new Articulo("A1", "Cafe de prueba", 10.0, 5.0, 1);
+        cafe = new Articulo("Cafe de prueba", 10.0, 5.0, 1);
         
         // Cliente Premium con 20% de descuento (0.20)
         clientePremium = new ClientePremium("Marta Premium", "Calle A", "12345678A", "marta@test.com");
@@ -27,7 +27,7 @@ public class PruebaTest {
 
         /* Lógica: (10 * 2) + (5 * 2) = 30 */ 
         //arrange
-        Articulo articulo = new Articulo ("Arti-1", "Camiseta", 10.0, 5.0, 60);
+        Articulo articulo = new Articulo ("Camiseta", 10.0, 5.0, 60);
         Cliente cliente = new ClienteEstandar("Juan", "C. Calabria", "47121189L", "Juan_ito@gmail.com");
         Pedido pedido = new Pedido (1, 2, LocalDateTime.now(),articulo, cliente);
         //act
@@ -49,7 +49,7 @@ public class PruebaTest {
     @Test
     public void siPuedeCancelarse() {
         // Arrange - tiempo de preparación 60 minutos, pedido hecho ahora
-        Articulo articulo = new Articulo("Arti-1", "Camiseta", 10.0, 5.0, 60);
+        Articulo articulo = new Articulo("Camiseta", 10.0, 5.0, 60);
         Cliente cliente = new ClienteEstandar("Juan", "C. Calabria", "47121189L", "Juan_ito@gmail.com");
         Pedido pedido = new Pedido(1, 2, LocalDateTime.now(), articulo, cliente);
 
@@ -60,7 +60,7 @@ public class PruebaTest {
     @Test
     void testControlExpiracionPedido() {
         // Creamos un artículo que se prepara en 0 minutos (expira al instante)
-        Articulo cafeFlash = new Articulo("A2", "Cafe Flash", 10.0, 5.0, 0);
+        Articulo cafeFlash = new Articulo("Cafe Flash", 10.0, 5.0, 0);
         Pedido pedidoExpira = new Pedido(2, 1, LocalDateTime.now(), cafeFlash, clienteNormal);
         
         // Al tener 0 min de preparación, no debería dejar cancelarlo nada más crearse
