@@ -11,10 +11,10 @@ public class MySQLPedidoDAO implements PedidoDAO {
     
     // SQL con JOIN para traer los datos del Cliente y del Artículo asociados al pedido
     private final String GET_ALL = "SELECT p.*, a.descripcion, a.precioVenta, a.gastosEnvio, a.tiempoPreparacion, " +
-                                   "c.nombre, c.domicilio, c.email, c.tipo " +
+                                   "c.nombre, c.domicilio, c.nif, c.tipo, c.email " +
                                    "FROM pedidos p " +
                                    "INNER JOIN articulos a ON p.articulo_codigo = a.codigo " +
-                                   "INNER JOIN clientes c ON p.nif_cliente = c.nif";
+                                   "INNER JOIN clientes c ON p.cliente_nif = c.nif";
 
     public void insertar(Pedido p) throws Exception {
         Connection conn = null;
@@ -22,7 +22,7 @@ public class MySQLPedidoDAO implements PedidoDAO {
             conn = ConexionBD.conectar();
             conn.setAutoCommit(false);
 
-            String sql = "{call sp_insertar_pedido(?, ?, ?, ?, ?)}";
+            String sql = "{call insertarPedido(?, ?, ?, ?, ?)}";
             try (CallableStatement cst = conn.prepareCall(sql)) {
                 cst.setInt(1, p.getNumeroPedido());
                 cst.setInt(2, p.getCantidad());
@@ -62,9 +62,19 @@ public class MySQLPedidoDAO implements PedidoDAO {
                 // 2. Reconstruir Cliente (según tipo)
                 Cliente cli;
                 if ("Premium".equals(rs.getString("tipo"))) {
-                    cli = new ClientePremium(rs.getString("nombre"), rs.getString("domicilio"), rs.getString("nif_cliente"), rs.getString("email"));
+                    cli = new ClientePremium(
+                        rs.getString("nombre"), 
+                        rs.getString("domicilio"), 
+                        rs.getString("nif"), 
+                        rs.getString("email")
+                    );
                 } else {
-                    cli = new ClienteEstandar(rs.getString("nombre"), rs.getString("domicilio"), rs.getString("nif_cliente"), rs.getString("email"));
+                    cli = new ClienteEstandar(
+                        rs.getString("nombre"), 
+                        rs.getString("domicilio"), 
+                        rs.getString("nif"), 
+                        rs.getString("email")
+                    );
                 }
 
                 // 3. Crear Pedido con sus objetos internos
