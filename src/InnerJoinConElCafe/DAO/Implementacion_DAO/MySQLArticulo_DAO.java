@@ -11,7 +11,7 @@ public class MySQLArticulo_DAO implements Articulo_DAO {
 
     @Override
     public void insertar (Articulo art) throws Exception {
-        String sql = "INSERT INTO Articulo (CodigoArticulo, Descripcion, PrecioVenta, GastosEnvio, TempoPreparacion) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Articulo (CodigoArticulo, Descripcion, PrecioVenta, GastosEnvio, TiempoPreparacion) VALUES (?, ?, ?, ?, ?)";
         try (Connection conexion = ConexionBBDD.Conectar();
         PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setString(1, art.getCodigo());

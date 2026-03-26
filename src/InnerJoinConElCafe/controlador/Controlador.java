@@ -1,7 +1,8 @@
 package InnerJoinConElCafe.controlador;
 
 import java.time.LocalDateTime;
-
+import java.util.ArrayList;
+import java.util.List;
 import InnerJoinConElCafe.excepciones.*;
 import InnerJoinConElCafe.modelo.*;
 
@@ -27,7 +28,7 @@ public class Controlador {
             }
 
             // 2. Validación de duplicados
-            for (Articulo a : datos.getListaArticulos().getArrayList()) {
+            for (Articulo a : datos.getListaArticulos()) {
                 if (a.getCodigo().equalsIgnoreCase(codigo)) {
                     throw new ArticuloException("El código '" + codigo + "' ya existe.");
                 }
@@ -46,16 +47,18 @@ public class Controlador {
     }
 
     //Mostrar articulo
-    public Resultado<Lista<Articulo>> obtenerArticulos() {
+    public Resultado<List<Articulo>> obtenerArticulos() {
         try {
-            Lista<Articulo> articulos = datos.getListaArticulos();
-            if (articulos.getSize() == 0) {
+            List<Articulo> articulos = datos.getListaArticulos();
+            if (articulos.isEmpty()) {
                 throw new ListaVaciaException("No hay artículos registrados en el catálogo.");
             }
             return new Resultado<>(articulos, "Lista de artículos obtenida con éxito.");
         } catch (ListaVaciaException e) {
             return new Resultado<>(e.getMessage());
-        }
+        } catch (Exception e) {
+        return new Resultado<>("Error de base de datos:" + e.getMessage());
+    }
     }
 
 
@@ -66,7 +69,7 @@ public class Controlador {
     public Resultado<String> añadirCliente(String nombre, String dom, String nif, String email, int tipo) {
         
         try {
-            for (Cliente c : datos.getListaClientes().getArrayList()) {
+            for (Cliente c : datos.getListaClientes()) {
                 if (c.getNif().equalsIgnoreCase(nif)) {
                     // LANZAMOS nuestra excepción personalizada
                     throw new ClienteException("Ya existe un cliente con el NIF: " + nif);
@@ -94,23 +97,23 @@ public class Controlador {
     }
 
     //Mostrar clientes
-    public Resultado<Lista<Cliente>> obtenerClientes(int opcion) {
+    public Resultado<List<Cliente>> obtenerClientes(int opcion) {
         try {
-            Lista<Cliente> todos = datos.getListaClientes();
-            Lista<Cliente> filtrados = new Lista<>();
+            List<Cliente> todos = datos.getListaClientes();
+            List<Cliente> filtrados = new ArrayList<>();
 
-            for (Cliente c : todos.getArrayList()) {
+            for (Cliente c : todos) {
                 if (opcion == 1) { // TODOS
-                    filtrados.añadir(c);
+                    filtrados.add(c);
                 } else if (opcion == 2 && c instanceof ClienteEstandar) { // SOLO ESTÁNDAR
-                    filtrados.añadir(c);
+                    filtrados.add(c);
                 } else if (opcion == 3 && c instanceof ClientePremium) { // SOLO PREMIUM
-                    filtrados.añadir(c);
+                    filtrados.add(c);
                 }
             }
 
             // Reutilizamos nuestra excepción si el filtro no devuelve nada
-            if (filtrados.getSize() == 0) {
+            if (filtrados.isEmpty()) {
                 throw new ListaVaciaException("No hay clientes del tipo seleccionado.");
             }
 
@@ -119,6 +122,9 @@ public class Controlador {
         } catch (ListaVaciaException e) {
             return new Resultado<>(e.getMessage());
         }
+        catch (Exception e) {
+            return new Resultado<>("Error de base de datos" + e.getMessage());
+        }
     }
 
 
@@ -126,16 +132,16 @@ public class Controlador {
     //Pedidos
 
     //Metodos para buscar cliente y articulo
-    public Articulo buscarArticulo(String codigo) throws DatoNoEncontradoException {
-        for (Articulo a : datos.getListaArticulos().getArrayList()) {
+    public Articulo buscarArticulo(String codigo) throws Exception {
+        for (Articulo a : datos.getListaArticulos()) {
             if (a.getCodigo().equals(codigo)) return a;
         }
         // Si sale del bucle sin retornar, es que no existe
         throw new DatoNoEncontradoException("El artículo con código '" + codigo + "' no existe.");
     }
 
-    public Cliente buscarCliente(String nif) throws DatoNoEncontradoException {
-        for (Cliente c : datos.getListaClientes().getArrayList()) {
+    public Cliente buscarCliente(String nif) throws Exception {
+        for (Cliente c : datos.getListaClientes()) {
             if (c.getNif().equals(nif)) return c;
         }
         // Si sale del bucle sin retornar, es que no existe
@@ -144,7 +150,11 @@ public class Controlador {
 
     //Nuevo metodo para generar el numero de pedido automaticamente
     public int generarNuevoNumeroPedido() {
-        return datos.getListaPedidos().getArrayList().size() + 1;
+        try {
+            return datos.getListaPedidos().size() +1;
+        } catch (Exception e) {
+            return 1;
+        }
     }
 
 
@@ -152,7 +162,7 @@ public class Controlador {
     public Resultado<String> añadirPedido(int num, String nif, String codigo, int cant) {
         try {
             // VALIDACIÓN DE DATOS
-            for (Pedido p : datos.getListaPedidos().getArrayList()) {
+            for (Pedido p : datos.getListaPedidos()) {
                 if (p.getNumeroPedido() == num) {
                     throw new PedidoException("Error: Ya existe un pedido con el número " + num + ".");
                 }
@@ -177,12 +187,12 @@ public class Controlador {
     }
 
     //Mostrar pedido
-    public Resultado<Lista<Pedido>> obtenerPedidosFiltrados(char opcionEstado, String nif) {
+    public Resultado<List<Pedido>> obtenerPedidosFiltrados(char opcionEstado, String nif) {
         try {
-            Lista<Pedido> todos = datos.getListaPedidos();
-            Lista<Pedido> filtrados = new Lista<>();
+            List<Pedido> todos = datos.getListaPedidos();
+            List<Pedido> filtrados = new ArrayList<>();
 
-            for (Pedido p : todos.getArrayList()) {
+            for (Pedido p : todos) {
                 boolean cumpleEstado = false;
                 if (opcionEstado == '1') cumpleEstado = true;
                 else if (opcionEstado == '2' && p.puedeCancelarse()) cumpleEstado = true;
@@ -191,17 +201,19 @@ public class Controlador {
                 boolean cumpleCliente = (nif == null || p.getCliente().getNif().equalsIgnoreCase(nif));
 
                 if (cumpleEstado && cumpleCliente) {
-                    filtrados.añadir(p);
+                    filtrados.add(p);
                 }
             }
 
-            if (filtrados.getSize() == 0) {
+            if (filtrados.isEmpty()) {
                 throw new ListaVaciaException("No se encontraron pedidos con los criterios seleccionados.");
             }
 
             return new Resultado<>(filtrados, "Búsqueda finalizada con éxito.");
         } catch (ListaVaciaException e) {
             return new Resultado<>(e.getMessage());
+        } catch (Exception e) {
+            return new Resultado<>("Error onexion a la BBDD: " + e.getMessage());
         }
     }
 
@@ -210,7 +222,7 @@ public class Controlador {
     public Resultado<String> cancelarPedido(int numeroPedido) {
         try {
             Pedido pedido = null;
-            for (Pedido p : datos.getListaPedidos().getArrayList()) {
+            for (Pedido p : datos.getListaPedidos()) {
                 if (p.getNumeroPedido() == numeroPedido) {
                     pedido = p;
                     break;
@@ -227,7 +239,7 @@ public class Controlador {
             pedido.cancelar(); 
 
             // 4. Si la línea anterior no lanzó excepción, procedemos a borrarlo de la lista
-            datos.getListaPedidos().borrar(pedido);
+            datos.getListaPedidos().remove(pedido);
         
             return new Resultado<>(null, "El pedido ha sido cancelado y eliminado del sistema.");
 
