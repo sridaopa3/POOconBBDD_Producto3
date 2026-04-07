@@ -1,68 +1,54 @@
 package InnerJoinConElCafe.modelo;
-import java.time.LocalDateTime;
+
+import InnerJoinConElCafe.modelo.dao.*;
+import java.util.List;
 
 public class Datos {
 
-    private Lista<Cliente> listaClientes;
-    private Lista<Articulo> listaArticulos;
-    private Lista<Pedido> listaPedidos;
+    // NUEVO: Manager para acceder a la Base de Datos
+    private DAOManager daoManager;
 
-    @Override
-    public String toString() {
-        return "Tienda{" +
-                "listaClientes=" + listaClientes +
-                ", listaArticulos=" + listaArticulos +
-                ", listaPedidos=" + listaPedidos +
-                '}';
-    }
 
     public Datos() {
-        this.listaClientes = new Lista<>();
-        this.listaArticulos = new Lista<>();
-        this.listaPedidos = new Lista<>();
-
-        //Cargar datos de prueba
-        cargarDatosPrueba();
+        // Inicializamos el manager de DAOs
+        this.daoManager = new DAOManager();
     }
 
-    // Getters
-    public Lista<Articulo> getListaArticulos() { return listaArticulos; }
-    public Lista<Cliente> getListaClientes() { return listaClientes; }
-    public Lista<Pedido> getListaPedidos() { return listaPedidos; }
+    // --- MÉTODOS PARA ARTÍCULOS ---
 
-    // Métodos para interactuar con las listas genéricas
-    public void addArticulo(Articulo a) {
-        listaArticulos.añadir(a);
+    public void addArticulo(Articulo a) throws Exception {
+        daoManager.getArticuloDAO().insertar(a);
     }
 
-    public void addCliente(Cliente c) {
-        listaClientes.añadir(c);
-    }
-
-    public void addPedido(Pedido p) {
-        listaPedidos.añadir(p);
+    public List<Articulo> getListaArticulos() throws Exception {
+        return daoManager.getArticuloDAO().obtenerTodos();
     }
 
 
-    //Datos de prueba
-    private void cargarDatosPrueba() {
-        // 1. Artículos
-        Articulo a1 = new Articulo("A1", "Cafe en grano 1kg", 15.50, 3.50, 5);
-        Articulo a2 = new Articulo("A2", "Cafetera Italiana", 45.00, 5.00, 10);
-        listaArticulos.añadir(a1);
-        listaArticulos.añadir(a2);
+    // --- MÉTODOS PARA CLIENTES ---
 
-        // 2. Clientes
-        Cliente c1 = new ClienteEstandar("Marta Garcia", "Calle Mayor 1", "12345678A", "marta@gmail.com");
-        Cliente c2 = new ClientePremium("Juan Perez", "Av. Diagonal 20", "87654321B", "juan@premium.com");
-        listaClientes.añadir(c1);
-        listaClientes.añadir(c2);
-
-        // 3. Pedidos
-        Pedido p1 = new Pedido(1, 2, LocalDateTime.now(), a1, c1);
-        Pedido p2 = new Pedido(2, 2, LocalDateTime.now(), a1, c2);
-        listaPedidos.añadir(p1);
-        listaPedidos.añadir(p2);
+    public void addCliente(Cliente c) throws Exception {
+        daoManager.getClienteDAO().insertar(c);
     }
+
+    public List<Cliente> getListaClientes() throws Exception {
+        return daoManager.getClienteDAO().obtenerTodos();
+    }
+
+
+    // --- MÉTODOS PARA PEDIDOS ---
+
+    public void addPedido(Pedido p) throws Exception {
+        daoManager.getPedidoDAO().insertar(p);
+    }
+
+    public List<Pedido> getListaPedidos() throws Exception {
+        return daoManager.getPedidoDAO().obtenerTodos();
+    }
+
+    public void eliminarPedido(Pedido p) throws Exception {
+        daoManager.getPedidoDAO().eliminar(p);
+    }
+
 }
 

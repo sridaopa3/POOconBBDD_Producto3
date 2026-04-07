@@ -2,14 +2,13 @@ package InnerJoinConElCafe.modelo;
 
 public class Articulo {
 
-    private String codigo;
+    private int codigo;
     private String descripcion;
     private double precioVenta;
     private double gastosEnvio;
     private int tiempoPreparacion;
 
-    public Articulo(String codigo, String descripcion, double precioVenta, double gastosEnvio, int tiempoPreparacion) {
-        this.codigo = codigo;
+    public Articulo(String descripcion, double precioVenta, double gastosEnvio, int tiempoPreparacion) {
         this.descripcion = descripcion;
         this.precioVenta = precioVenta;
         this.gastosEnvio = gastosEnvio;
@@ -27,11 +26,11 @@ public class Articulo {
                 '}';
     }
 
-    public String getCodigo() {
+    public int getCodigo() {
         return codigo;
     }
 
-    public void setCodigo(String codigo) {
+    public void setCodigo(int codigo) {
         this.codigo = codigo;
     }
 

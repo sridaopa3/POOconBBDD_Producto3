@@ -63,4 +63,7 @@ public abstract class Cliente {
         return precioBase; // El cliente estándar devuelve el precio tal cual
     }
 
+    public abstract double getCuotaAnual();
+    public abstract double getDescuentoEnvio();
+
 }

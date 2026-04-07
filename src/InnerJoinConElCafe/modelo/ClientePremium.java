@@ -30,4 +30,9 @@ private static final double DESCUENTO_ENVIO = 0.20;
         return CUOTA_ANUAL;
     }
 
+    @Override
+    public double getDescuentoEnvio() {
+        return DESCUENTO_ENVIO;
+    }
+
 }

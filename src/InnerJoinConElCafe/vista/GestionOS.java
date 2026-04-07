@@ -77,8 +77,6 @@ public class GestionOS {
     //Articulos
     private void añadirArticulo() {
         System.out.println("--- Nuevo Artículo ---");
-        System.out.print("Código: ");
-        String codigo = teclado.nextLine();
         System.out.print("Descripción: ");
         String desc = teclado.nextLine();
 
@@ -91,7 +89,7 @@ public class GestionOS {
                 precioV = Double.parseDouble(teclado.nextLine());
                 precioValido = true;
             } catch (NumberFormatException e) {
-                System.out.println("Error: Introduce un número decimal válido (ej: 10,5).");
+                System.out.println("Error: Introduce un número decimal válido (ej: 10.5).");
             }
         }
 
@@ -104,7 +102,7 @@ public class GestionOS {
                 gastosE = Double.parseDouble(teclado.nextLine());
                 gastosValidos = true;
             } catch (NumberFormatException e) {
-                System.out.println("Error: Introduce un número decimal válido (ej: 10,5).");
+                System.out.println("Error: Introduce un número decimal válido (ej: 10.5).");
             }
         }
 
@@ -122,7 +120,7 @@ public class GestionOS {
         }
 
         // Enviamos los datos ya limpios y validados al controlador
-        Resultado<String> res = controlador.añadirArticulo(codigo, desc, precioV, gastosE, tiempoPrep);
+        Resultado<String> res = controlador.añadirArticulo(desc, precioV, gastosE, tiempoPrep);
         System.out.println(res.getMensaje());
     }
 
@@ -227,11 +225,14 @@ public class GestionOS {
                 System.out.println("Pedido cancelado: cliente no encontrado.");
                 return; 
             }
+        } catch (Exception e) {
+            System.out.println("Error crítico de base de datos: " + e.getMessage());
+            return;
         }
 
-       // 3. VERIFICACION DE ARTICULO (existe)
-        String codigo = "";
-        boolean articuloValido = false;
+        System.out.println("Código del Artículo:");
+        int codigo = teclado.nextInt();
+        teclado.nextLine();
     
         while (!articuloValido) {
             System.out.print("Código del Artículo: ");
