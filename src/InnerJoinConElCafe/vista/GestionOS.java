@@ -233,19 +233,7 @@ public class GestionOS {
         System.out.println("Código del Artículo:");
         int codigo = teclado.nextInt();
         teclado.nextLine();
-    
-        while (!articuloValido) {
-            System.out.print("Código del Artículo: ");
-            codigo = teclado.nextLine();
-        
-            try {
-                controlador.buscarArticulo(codigo);
-                articuloValido = true; // Si lo encuentra, salimos del bucle
-            } catch (DatoNoEncontradoException e) {
-                System.out.println("Error: " + e.getMessage());
-                System.out.println("Por favor, introduce un código de artículo que exista.");
-            }
-        }
+
 
         // 4. VERIFICACION DE CANTIDAD
         int cant = 0;
